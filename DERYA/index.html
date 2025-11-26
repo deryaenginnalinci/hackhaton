@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Core Node Lessons</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+
+  <body>
+    <!-- NAV -->
+    <nav>
+      <ul class="nav-list">
+        <li><a href="/">Inicio</a></li>
+        <li><a href="/lesson/1">Lección 1</a></li>
+        <li><a href="/lesson/2">Lección 2</a></li>
+        <li><a href="/lesson/3">Lección 3</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/contact">Contacto</a></li>
+      </ul>
+    </nav>
+
+    <!-- BLOQUES DE LECCIONES -->
+    <section class="lecciones">
+      <div class="leccion" onclick="location.href='/lesson/1'">
+        <div class="icono">⚡</div>
+        <h2>Event emitters</h2>
+        <p>Cómo funcionan los eventos y la comunicación interna.</p>
+      </div>
+
+      <div class="leccion" onclick="location.href='/lesson/2'">
+        <div class="icono">🔁</div>
+        <h2>Streams</h2>
+        <p>Procesamiento eficiente de datos en movimiento.</p>
+      </div>
+
+      <div class="leccion" onclick="location.href='/lesson/3'">
+        <div class="icono">🚨</div>
+        <h2>Error control</h2>
+        <p>Manejo seguro y elegante de errores en Node.js.</p>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <a href="https://www.linkedin.com" target="_blank">Derya Engin</a>
+      <a href="https://www.linkedin.com" target="_blank">Vera Rubio</a>
+      <p>© 2025 - 2026 All rights reserved</p>
+    </footer>
+
+    <!-- ❌ NO cargar server.js aquí -->
+    <!-- <script type="module" src="/server.js"></script> -->
+  </body>
+</html>

@@ -1,58 +1,102 @@
-/* Estilos generales */
+/* --------------------------
+   ESTILOS GENERALES
+--------------------------- */
+
 body {
   margin: 0;
   padding: 0;
   font-family: Arial, sans-serif;
-  background-color: #000;
-  background: url('./img/fondo.jpg') no-repeat center center fixed;
+  background: url("/img/fondo.jpg") no-repeat center center fixed;
   background-size: cover;
   color: #fff;
 }
 
-/* Menú horizontal */
-nav {
-  background-color: #111;
-  padding: 15px 0;
-  text-align: center;
+/* Sticky layout */
+html,
+body {
+  height: 100%;
 }
 
-nav ul {
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+footer {
+  margin-top: auto; /* Esto empuja el footer al final */
+}
+
+/* --------------------------
+   MENÚ SUPERIOR
+--------------------------- */
+
+/* NAV responsive & estético */
+nav {
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 12px 10px;
+  text-align: center;
+  backdrop-filter: blur(6px);
+}
+
+.nav-list {
   list-style: none;
   margin: 0;
   padding: 0;
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
-nav ul li {
+.nav-list li {
   display: inline-block;
-  margin: 0 20px;
 }
 
-nav ul li a {
+.nav-list a {
   color: #fff;
   text-decoration: none;
-  font-size: 18px;
+  font-size: 16px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  transition: 0.18s;
 }
 
-nav ul li a:hover {
-  text-decoration: underline;
+.nav-list a:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #00aaff;
 }
 
-/* Contenedores de las lecciones */
+/* Mobile: nav öğeleri daha okunaklı alt alta gelebilsin */
+@media (max-width: 600px) {
+  .nav-list {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+/* --------------------------
+   CONTENEDORES DEL INDEX
+--------------------------- */
+
 .lecciones {
+  min-height: calc(100vh - 200px);
   display: flex;
   justify-content: center;
-  gap: 50px;
-  margin: 80px 0;
+  align-items: center;
+  gap: 80px; /* separa los bloques entre sí */
 }
 
 .leccion {
-  background-color: #222;
+  background-color: rgba(0, 0, 0, 0.6);
   padding: 40px 50px;
   border-radius: 12px;
   cursor: pointer;
   text-align: center;
-  width: 220px; /* más tamaño */
+  width: 220px;
   transition: 0.3s;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .leccion h2 {
@@ -67,29 +111,227 @@ nav ul li a:hover {
 }
 
 .leccion:hover {
-  background-color: #333;
+  background-color: rgba(0, 0, 0, 0.8);
   transform: translateY(-5px);
 }
 
-/* Footer */
+.icono {
+  font-size: 40px;
+  margin-bottom: 10px;
+  opacity: 0.9;
+}
+
+/* --------------------------
+   FOOTER
+--------------------------- */
+
 footer {
-  background-color: #111;
+  margin-top: auto;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
   padding: 20px 0;
+  position: relative;
   text-align: center;
-  margin-top: 80px;
+  width: 100%;
+  overflow: hidden;
 }
 
-footer a {
+/* Enlaces en esquinas */
+footer a:first-of-type {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+footer a:last-of-type {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Texto centrado */
+footer p {
+  margin: 0;
+}
+
+/* --------------------------
+   PÁGINAS DE LECCIÓN
+--------------------------- */
+
+.lesson-wrapper {
+  max-width: 900px;
+  margin: 60px auto;
+  background-color: rgba(0, 0, 0, 0.65);
+  padding: 40px;
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+}
+
+/* Cada capítulo */
+.chapter {
+  padding: 30px;
+  background-color: #111;
+  border-left: 5px solid #00aaff;
+  border-radius: 10px;
+  margin-bottom: 40px;
+}
+
+/* Título de cada capítulo */
+.chapter h2 {
+  font-size: 26px;
+  margin-top: 0;
   color: #00aaff;
-  margin: 0 15px;
-  text-decoration: none;
+  text-transform: capitalize;
 }
 
-footer a:hover {
+/* Markdown Headers */
+.chapter h1,
+.chapter h3,
+.chapter h4 {
+  color: #fff;
+  margin-top: 25px;
+}
+
+/* Párrafos */
+.chapter p {
+  color: #ddd;
+  line-height: 1.6;
+  margin: 12px 0;
+}
+
+/* Listas del Markdown */
+.chapter ul {
+  margin-left: 20px;
+}
+
+.chapter li {
+  margin-bottom: 6px;
+  color: #ccc;
+}
+
+/* Bloques de código */
+.chapter pre {
+  background-color: #222;
+  padding: 15px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 20px 0;
+}
+
+.chapter code {
+  color: #00ffea;
+  font-family: "Consolas", "Courier New", monospace;
+}
+
+/* Citas del Markdown */
+.chapter blockquote {
+  border-left: 4px solid #00aaff;
+  padding-left: 15px;
+  margin: 20px 0;
+  color: #bbb;
+  font-style: italic;
+}
+
+.lesson-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+}
+
+.nav-btn {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 12px 20px;
+  color: #00aaff;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: 0.25s;
+}
+
+.nav-btn:hover {
+  background: rgba(0, 0, 0, 0.9);
+  transform: translateY(-3px);
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .lesson-nav {
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+  }
+
+  .nav-btn {
+    width: 80%;
+    text-align: center;
+  }
+}
+
+/* LAYOUT: sidebar + main content */
+.layout {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+/* SIDEBAR */
+.toc {
+  width: 240px;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 20px;
+  border-radius: 12px;
+  height: fit-content;
+  position: sticky;
+  top: 40px;
+}
+
+.toc h3 {
+  margin-top: 0;
+  color: #00aaff;
+}
+
+.toc ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.toc li {
+  margin-bottom: 8px;
+}
+
+.toc a {
+  color: #ddd;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.toc a:hover {
+  color: #00ccff;
   text-decoration: underline;
 }
 
-footer p {
-  margin-top: 10px;
-  color: #aaa;
+/* Indentación dependiendo del nivel de encabezado */
+.toc .lvl-2 {
+  margin-left: 10px;
+}
+.toc .lvl-3 {
+  margin-left: 20px;
+}
+.toc .lvl-4 {
+  margin-left: 30px;
+}
+
+/* MOBILE */
+@media (max-width: 900px) {
+  .layout {
+    flex-direction: column;
+  }
+  .toc {
+    width: 100%;
+    position: relative;
+  }
 }
