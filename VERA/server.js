@@ -8,7 +8,7 @@ let marked;
   marked = (await import('marked')).marked;
 })();
 
-const PORT = 3000;
+const PORT = 8080;
 
 // Transform Markdown → HTML
 class MarkdownToHTML extends Transform {
