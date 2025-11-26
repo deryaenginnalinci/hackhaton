@@ -1,19 +1,40 @@
-/* Estilos generales */
+/* --------------------------
+   ESTILOS GENERALES
+--------------------------- */
+
 body {
   margin: 0;
   padding: 0;
   font-family: Arial, sans-serif;
-  background-color: #000;
-  background: url('./img/fondo.jpg') no-repeat center center fixed;
+  background: url('/img/fondo.jpg') no-repeat center center fixed;
   background-size: cover;
   color: #fff;
 }
 
-/* Menú horizontal */
+/* Sticky layout */
+html,
+body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+footer {
+  margin-top: auto; /* Esto empuja el footer al final */
+}
+
+/* --------------------------
+   MENÚ SUPERIOR
+--------------------------- */
+
 nav {
-  background-color: #111;
+  background-color: rgba(0, 0, 0, 0.7);
   padding: 15px 0;
   text-align: center;
+  backdrop-filter: blur(6px);
 }
 
 nav ul {
@@ -31,28 +52,36 @@ nav ul li a {
   color: #fff;
   text-decoration: none;
   font-size: 18px;
+  transition: 0.2s;
 }
 
 nav ul li a:hover {
   text-decoration: underline;
+  color: #00aaff;
 }
 
-/* Contenedores de las lecciones */
+/* --------------------------
+   CONTENEDORES DEL INDEX
+--------------------------- */
+
 .lecciones {
+  min-height: calc(100vh - 200px);
   display: flex;
   justify-content: center;
-  gap: 50px;
-  margin: 80px 0;
+  align-items: center;
+  gap: 80px; /* separa los bloques entre sí */
 }
 
 .leccion {
-  background-color: #222;
+  background-color: rgba(0, 0, 0, 0.6);
   padding: 40px 50px;
   border-radius: 12px;
   cursor: pointer;
   text-align: center;
-  width: 220px; /* más tamaño */
+  width: 220px;
   transition: 0.3s;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .leccion h2 {
@@ -67,29 +96,119 @@ nav ul li a:hover {
 }
 
 .leccion:hover {
-  background-color: #333;
+  background-color: rgba(0, 0, 0, 0.8);
   transform: translateY(-5px);
 }
 
-/* Footer */
+/* --------------------------
+   FOOTER
+--------------------------- */
+
 footer {
-  background-color: #111;
+  margin-top: auto;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
   padding: 20px 0;
+  position: relative;
   text-align: center;
-  margin-top: 80px;
+  width: 100%;
+  overflow: hidden;
 }
 
-footer a {
-  color: #00aaff;
-  margin: 0 15px;
-  text-decoration: none;
+/* Enlaces en esquinas */
+footer a:first-of-type {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
-footer a:hover {
-  text-decoration: underline;
+footer a:last-of-type {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
+/* Texto centrado */
 footer p {
-  margin-top: 10px;
-  color: #aaa;
+  margin: 0;
+}
+
+/* --------------------------
+   PÁGINAS DE LECCIÓN
+--------------------------- */
+
+.lesson-wrapper {
+  max-width: 900px;
+  margin: 60px auto;
+  background-color: rgba(0, 0, 0, 0.65);
+  padding: 40px;
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+}
+
+/* Cada capítulo */
+.chapter {
+  padding: 30px;
+  background-color: #111;
+  border-left: 5px solid #00aaff;
+  border-radius: 10px;
+  margin-bottom: 40px;
+}
+
+/* Título de cada capítulo */
+.chapter h2 {
+  font-size: 26px;
+  margin-top: 0;
+  color: #00aaff;
+  text-transform: capitalize;
+}
+
+/* Markdown Headers */
+.chapter h1,
+.chapter h3,
+.chapter h4 {
+  color: #fff;
+  margin-top: 25px;
+}
+
+/* Párrafos */
+.chapter p {
+  color: #ddd;
+  line-height: 1.6;
+  margin: 12px 0;
+}
+
+/* Listas del Markdown */
+.chapter ul {
+  margin-left: 20px;
+}
+
+.chapter li {
+  margin-bottom: 6px;
+  color: #ccc;
+}
+
+/* Bloques de código */
+.chapter pre {
+  background-color: #222;
+  padding: 15px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 20px 0;
+}
+
+.chapter code {
+  color: #00ffea;
+  font-family: 'Consolas', 'Courier New', monospace;
+}
+
+/* Citas del Markdown */
+.chapter blockquote {
+  border-left: 4px solid #00aaff;
+  padding-left: 15px;
+  margin: 20px 0;
+  color: #bbb;
+  font-style: italic;
 }
