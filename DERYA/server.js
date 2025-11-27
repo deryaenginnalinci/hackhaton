@@ -1,20 +1,31 @@
-const http = require("http");
-const fs = require("fs");
-const path = require("path");
-const { Transform } = require("stream");
-const { pipeline } = require("stream/promises");
+// server.js con sidebar y comentarios explicativos en español
+
+// -------------------------------
+// IMPORTS BÁSICOS DE NODE
+// -------------------------------
+const http = require("http"); // Crea el servidor HTTP
+const fs = require("fs"); // Permite leer archivos del sistema
+const path = require("path"); // Manejo seguro de rutas
+const { Transform } = require("stream"); // Clase base para crear transform streams
+const { pipeline } = require("stream/promises"); // Para conectar streams usando async/await
+
+// Usamos import dinámico (ESM) para "Marked"
 let marked;
 (async () => {
-  marked = (await import("marked")).marked;
+  marked = (await import("marked")).marked; // Convierte Markdown → HTML
 })();
 
-const PORT = 8080;
+const PORT = 8080; // Puerto del servidor local
 
-// Transform Markdown → HTML
+// --------------------------------------------------------------------
+//                     TRANSFORM STREAM MD → HTML
+// --------------------------------------------------------------------
+// Esta clase transforma archivos Markdown leídos por streaming en HTML.
+// Se usa para evitar cargar archivos enteros en memoria.
 class MarkdownToHTML extends Transform {
   constructor() {
     super();
-    this.buffer = "";
+    this.buffer = ""; // Acumulamos aquí el contenido MD
   }
 
   _transform(chunk, encoding, callback) {
@@ -23,13 +34,16 @@ class MarkdownToHTML extends Transform {
   }
 
   _flush(callback) {
-    const html = marked.parse(this.buffer);
+    const html = marked.parse(this.buffer); // Convertimos a HTML
     this.push(html);
     callback();
   }
 }
 
-// Rutas reales de tus carpetas
+// --------------------------------------------------------------------
+//              OBTENER RUTAS DE ARCHIVOS DE CADA LECCIÓN
+// --------------------------------------------------------------------
+// Esta función devuelve las rutas a los 3 capítulos MD de cada lección.
 function getLessonPaths(id) {
   const folderNames = {
     1: "01.Event-emitters",
@@ -47,59 +61,43 @@ function getLessonPaths(id) {
   ];
 }
 
-function extractHeadings(html) {
-  const headingRegex = /<h([1-6])>(.*?)<\/h\1>/g;
-  const headings = [];
+// --------------------------------------------------------------------
+//         FUNCIÓN PARA GENERAR EL SIDEBAR (Tabla de contenidos)
+// --------------------------------------------------------------------
+// EXTRA: analizamos los encabezados del HTML generado para construir un TOC.
+function generateSidebar(htmlContent) {
+  // Buscamos títulos h1-h4 del markdown procesado
+  const headingRegex = /<h([1-4])[^>]*>([\s\S]*?)<\/h\1>/g; // cambiado para que pueda leer los emojis
   let match;
+  let toc = "<div class='toc'><h3>Contenido</h3><ul>";
 
-  while ((match = headingRegex.exec(html)) !== null) {
-    const level = Number(match[1]);
-    const text = match[2];
-    const id = text.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  while ((match = headingRegex.exec(htmlContent)) !== null) {
+    const level = parseInt(match[1]);
+    const title = match[2];
+    const id = title.toLowerCase().replace(/ /g, "-");
 
-    headings.push({ level, text, id });
+    // Insertamos ancla en el contenido final
+    htmlContent = htmlContent.replace(
+      match[0],
+      `<h${level} id='${id}'>${title}</h${level}>`
+    );
+
+    toc += `<li class='lvl-${level}'><a href='#${id}'>${title}</a></li>`;
   }
 
-  return headings;
+  toc += "</ul></div>";
+
+  return { toc, updatedHTML: htmlContent };
 }
 
-function navButtons(id) {
-  const prev =
-    id > 1
-      ? `<a class="nav-btn prev" href="/lesson/${id - 1}">← Previous</a>`
-      : "";
-  const next =
-    id < 3 ? `<a class="nav-btn next" href="/lesson/${id + 1}">Next →</a>` : "";
-
-  return `
-    <div class="lesson-nav">
-      ${prev}
-      ${next}
-    </div>
-  `;
-}
-
-function tableOfContents(html) {
-  const headings = extractHeadings(html);
-
-  if (headings.length === 0) return "";
-
-  let tocHTML = '<div class="toc"><h3>Índice</h3><ul>';
-
-  for (const h of headings) {
-    tocHTML += `
-      <li class="lvl-${h.level}">
-        <a href="#${h.id}">${h.text}</a>
-      </li>`;
-  }
-
-  tocHTML += "</ul></div>";
-
-  return tocHTML;
-}
-
-// HTML final
+// --------------------------------------------------------------------
+//    ENVOLTURA HTML FINAL (sidebar separado + contenido centrado)
+// --------------------------------------------------------------------
 function wrapHTML(content, title) {
+  const { toc, updatedHTML } = generateSidebar(content);
+
+  console.log(">>> NUEVO WRAP HTML ACTIVO <<<");
+
   return `
   <!DOCTYPE html>
   <html lang="es">
@@ -108,69 +106,89 @@ function wrapHTML(content, title) {
     <title>${title}</title>
     <link rel="stylesheet" href="/styles.css">
   </head>
+
   <body>
-    <nav>
-      <a href="/">Volver</a>
-    </nav>
 
-  <div class="layout">
-  ${tableOfContents(content)}
+    <!-- Sidebar independiente -->
+    <aside class="sidebar-wrapper">
+      ${toc}
+    </aside>
 
-  <main class="lesson-wrapper">
-    ${content}
-    ${navButtons(parseInt(title.replace("Lección ", "")))}
-  </main>
-</div>
+    <!-- Contenido centrado -->
+    <main class="lesson-wrapper">
 
+      <!-- Volver dentro del contenido -->
+      <div class="volver">
+        <a href="/">Volver</a>
+      </div>
+
+      ${updatedHTML}
+
+    </main>
 
   </body>
   </html>`;
 }
 
+
+// --------------------------------------------------------------------
+//                           SERVIDOR HTTP
+// --------------------------------------------------------------------
 const server = http.createServer(async (req, res) => {
   console.log("URL recibida:", req.url);
 
-  // SERVIR INDEX
+  // INDEX
   if (req.url === "/" || req.url === "/index.html") {
     res.writeHead(200, { "Content-Type": "text/html" });
     fs.createReadStream("./index.html").pipe(res);
     return;
   }
 
-  // SERVIR CSS
+  // ABOUT
+  if (req.url === "/about") {
+    res.writeHead(200, { "Content-Type": "text/html" });
+    fs.createReadStream("./about.html").pipe(res);
+    return;
+  }
+
+  // CONTACT
+  if (req.url === "/contact") {
+    res.writeHead(200, { "Content-Type": "text/html" });
+    fs.createReadStream("./contact.html").pipe(res);
+    return;
+  }
+
+  // CSS
   if (req.url === "/styles.css") {
     res.writeHead(200, { "Content-Type": "text/css" });
     fs.createReadStream("./styles.css").pipe(res);
     return;
   }
 
-  // SERVIR IMÁGENES
+  // IMÁGENES
   if (req.url.startsWith("/img/")) {
-    const filePath = path.join(".", req.url);
-    res.writeHead(200, { "Content-Type": "image/jpeg" });
+    const filePath = path.join(__dirname, req.url);
+    const ext = path.extname(filePath);
+
+    const mime =
+      {
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".png": "image/png",
+        ".gif": "image/gif",
+        ".webp": "image/webp",
+      }[ext] || "application/octet-stream";
+
+    res.writeHead(200, { "Content-Type": mime });
     fs.createReadStream(filePath).pipe(res);
     return;
   }
 
-  // SERVIR ABOUT
-  if (req.url === "/about" || req.url === "/about.html") {
-    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-    fs.createReadStream("./about.html").pipe(res);
-    return;
-  }
-
-  // SERVIR CONTACT
-  if (req.url === "/contact" || req.url === "/contact.html") {
-    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-    fs.createReadStream("./contact.html").pipe(res);
-    return;
-  }
-
-  // SERVIR LECCIONES
+  // LECCIONES MD → HTML
   if (req.url.startsWith("/lesson/")) {
     const id = parseInt(req.url.split("/")[2]);
-
     const paths = getLessonPaths(id);
+
     if (!paths) {
       res.writeHead(404);
       res.end("Lección no encontrada");
@@ -185,7 +203,6 @@ const server = http.createServer(async (req, res) => {
       for (const mdPath of paths) {
         const mdStream = fs.createReadStream(mdPath);
         const transformer = new MarkdownToHTML();
-
         let htmlChunk = "";
 
         await pipeline(mdStream, transformer, async function* (source) {
@@ -193,15 +210,6 @@ const server = http.createServer(async (req, res) => {
             htmlChunk += chunk.toString();
           }
         });
-
-        // Añader IDs a los headings
-        htmlChunk = htmlChunk.replace(
-          /<h([1-6])>(.*?)<\/h\1>/g,
-          (m, level, text) => {
-            const id = text.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-            return `<h${level} id="${id}">${text}</h${level}>`;
-          }
-        );
 
         finalHTML += `
           <section class="chapter">
@@ -211,8 +219,8 @@ const server = http.createServer(async (req, res) => {
       }
 
       res.end(wrapHTML(finalHTML, `Lección ${id}`));
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       res.writeHead(500);
       res.end("Error interno del servidor");
     }
@@ -220,11 +228,13 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // 404 si no coincide con nada
   res.writeHead(404);
   res.end("404 Not Found");
 });
 
-server.listen(PORT, () => {
-  console.log(`Servidor en http://localhost:${PORT}`);
+// --------------------------------------------------------------------
+//                        INICIAR SERVIDOR LOCAL
+// --------------------------------------------------------------------
+server.listen(PORT, "127.0.0.1", () => {
+  console.log(`Servidor protegido en http://localhost:${PORT}`);
 });
